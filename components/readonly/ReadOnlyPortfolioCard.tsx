@@ -1,11 +1,11 @@
 "use client";
 
-import Card from "./ui/Card";
-import SkeletonCard from "./ui/SkeletonCard";
+import Card from "../ui/Card";
+import SkeletonCard from "../ui/SkeletonCard";
 import { formatCurrency, formatTokenAmount } from "@/lib/format";
-import { useState, useEffect } from "react";
-import { useAccount, useChainId } from "wagmi";
-import TokenAllocationChart from "./visual/TokenAllocationChart";
+import { useEffect, useState } from "react";
+import { useChainId } from "wagmi";
+import TokenAllocationChart from "../visual/TokenAllocationChart";
 
 type TokenBalance = {
   symbol: string;
@@ -13,35 +13,34 @@ type TokenBalance = {
   usdPrice: number;
 };
 
-export default function PortfolioCard() {
-  const { address, isConnected } = useAccount();
+export default function ReadOnlyPortfolioCard({
+  address,
+}: {
+  address: string;
+}) {
   const chainId = useChainId();
-
   const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isConnected || !address) return;
+    if (!address) return;
     setLoading(true);
     setError(null);
 
-    // mock data for now
-    const mockPortfolio: TokenBalance[] = [
-      { symbol: "ETH", amount: 0.12345, usdPrice: 3200 },
-      { symbol: "USDC", amount: 42.5, usdPrice: 1 },
-      { symbol: "MATIC", amount: 88, usdPrice: 0.8 },
+    const mock: TokenBalance[] = [
+      { symbol: "ETH", amount: 0.5, usdPrice: 3200 },
+      { symbol: "USDC", amount: 100, usdPrice: 1 },
+      { symbol: "MATIC", amount: 250, usdPrice: 0.8 },
     ];
 
     const t = setTimeout(() => {
-      setTokens(mockPortfolio);
+      setTokens(mock);
       setLoading(false);
-    }, 500);
+    }, 400);
 
     return () => clearTimeout(t);
-  }, [isConnected, address, chainId]);
-
-  if (!isConnected || !address) return null;
+  }, [address, chainId]);
 
   if (loading) {
     return <SkeletonCard title="Portfolio" lines={4} />;
@@ -55,7 +54,7 @@ export default function PortfolioCard() {
             Portfolio
           </h2>
           <p className="mt-2 text-xs text-red-500">
-            Could not load balances. Please refresh or switch network.
+            Could not load balances for {address.slice(0, 6)}…
           </p>
         </div>
       </Card>
@@ -66,7 +65,8 @@ export default function PortfolioCard() {
     ...t,
     value: t.amount * t.usdPrice,
   }));
-  const totalValue = rows.reduce((acc, r) => acc + r.value, 0);
+
+  const totalValue = rows.reduce((sum, r) => sum + r.value, 0);
 
   return (
     <Card>
@@ -91,7 +91,7 @@ export default function PortfolioCard() {
           </div>
         </div>
 
-        {/* Donut chart */}
+        {/* Chart */}
         <TokenAllocationChart tokens={rows} />
 
         {/* Table */}
