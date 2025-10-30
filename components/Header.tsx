@@ -66,14 +66,7 @@ export default function Header() {
 
         {/* Right cluster: theme + connect */}
         <div className="flex items-center gap-3 self-end md:self-auto">
-          {mounted && (
-            <button
-              onClick={handleToggleTheme}
-              className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-            >
-              {resolvedTheme === "dark" ? "☀︎ Light" : "🌙 Dark"}
-            </button>
-          )}
+          
 
           <ConnectButton
             showBalance={false}
